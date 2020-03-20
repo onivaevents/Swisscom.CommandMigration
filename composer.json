@@ -1,0 +1,18 @@
+{
+    "description": "Neos Flow package for framework based CLI command migrations",
+    "type": "neos-package",
+    "name": "swisscom/commandmigration",
+    "require": {
+        "neos/flow": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Swisscom\\CommandMigration\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Swisscom.CommandMigration"
+        }
+    }
+}
