@@ -239,7 +239,7 @@ class MigrationService
             return $this->migrations;
         }
         if (!isset($this->migrations[$versionNumber])) {
-            throw new \InvalidArgumentException(sprintf('Migration "%s" was not found', $versionNumber), 1421667040);
+            throw new \InvalidArgumentException(sprintf('Migration "%s" was not found', $versionNumber), 1584740599);
         }
         return [$versionNumber => $this->migrations[$versionNumber]];
     }
@@ -272,7 +272,7 @@ class MigrationService
     protected function getMigrationStatus(): array
     {
         $migrations = $this->getMigrations();
-        $executedMigrations = $this->migrationStatusRepository->countAll();
+        $numExecutedMigrations = $this->migrationStatusRepository->countAll();
         $numNewMigrations = $numExecutedAvailableMigrations = 0;
 
         foreach ($migrations as $versionNumber => $dto) {
@@ -290,7 +290,7 @@ class MigrationService
         $current = $current ?? 'No migration executed yet';
         $next = $next ?? 'Already at latest version';
         $latest = $latest ?? 'No migrations available yet';
-        $numExecutedUnavailableMigrations = $executedMigrations - $numExecutedAvailableMigrations;
+        $numExecutedUnavailableMigrations = $numExecutedMigrations - $numExecutedAvailableMigrations;
 
         return [
             'Name' => 'Command Migrations',
@@ -298,7 +298,7 @@ class MigrationService
             'Current Version' => MigrationUtility::getFormattedVersion($current),
             'Next Version' => MigrationUtility::getFormattedVersion($next),
             'Latest Version' => MigrationUtility::getFormattedVersion($latest),
-            'Executed Migrations' => $executedMigrations,
+            'Executed Migrations' => $numExecutedMigrations,
             'Executed Unavailable Migrations' => $numExecutedUnavailableMigrations,
             'Available Migrations' => count($migrations),
             'New Migrations' => $numNewMigrations,
