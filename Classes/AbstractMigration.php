@@ -54,7 +54,7 @@ abstract class AbstractMigration
                 array_keys($command['arguments'])
             ));
 
-            $result = './flow ' . $command['identifier'] . ' ' . $argumentString . PHP_EOL;
+            $result .= './flow ' . $command['identifier'] . ' ' . $argumentString . PHP_EOL;
         }
 
         return $result;
