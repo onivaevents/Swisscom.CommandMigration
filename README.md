@@ -2,9 +2,9 @@
 
 Neos Flow package for framework based CLI command migrations.
 
-Command migrations allow to create migration scripts similar to Doctrine migrations to execute Flow CLI commands when executing the migration by the command `./flow commandmigration:migrate`.
+The package allows to create migration scripts similar to Doctrine migrations. Contrary to executing SQL statements, it allows you to define versions with sets of Flow CLI commands. Those are executed when running the migration by the command `./flow commandmigration:migrate`.
 
-This solves the problem when executing one-off commands on distributed environments as well as staging environments. The migration command might become part of your deployment strategy as well as the `./flow doctrine:migrate` command probably is already.
+This mainly solves the problem of executing one-off commands on distributed environments as well as different staging environments. Without this package, those one-off commands are possibly executed manually when needed, or are part of some other scripts in your deployment process. With this package, this becomes part of the code base. For integration, the migration command might be added to your deployment strategy the same way as the `./flow doctrine:migrate` command probably already is.
 
 
 ## Usage
