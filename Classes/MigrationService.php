@@ -254,7 +254,8 @@ class MigrationService
     {
         $migration = $dto->getMigration();
         $versionNumber = MigrationUtility::getVersionNumber($migration);
-        $outputCallback->call($this, '++ migrating ' . $versionNumber);
+        // Output starts with EOL in case of command output of previous migration which does not ends with a new line
+        $outputCallback->call($this, PHP_EOL . '++ migrating ' . $versionNumber);
         $migration->up();
         if ($dryRun) {
             $outputCallback->call($this, $migration->dryRun());
