@@ -16,7 +16,7 @@ class MigrationUtility
      * @param object $object The migration class object
      * @return string
      */
-    public static function getVersionNumber(object $object): string
+    public static function getVersionNumber($object): string
     {
         return substr(strrchr(get_class($object), 'Version'), 7);
     }
