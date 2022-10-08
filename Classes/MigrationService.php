@@ -315,7 +315,14 @@ class MigrationService
             $versionNumber = MigrationUtility::getVersionNumber($dto->getMigration());
             $migrationStatus = new MigrationStatus($versionNumber);
             $this->migrationStatusRepository->add($migrationStatus);
-            $this->persistenceManager->whitelistObject($migrationStatus);
+
+            // Flow backwards compatibility check
+            if (method_exists($this->persistenceManager, 'allowObject')) {
+                $this->persistenceManager->allowObject($migrationStatus);
+            } else {
+                $this->persistenceManager->whitelistObject($migrationStatus);
+            }
+
             $this->persistenceManager->persistAll(true);
         }
     }
@@ -329,7 +336,14 @@ class MigrationService
         if ($dto->isMigrated()) {
             $migrationStatus = $dto->getMigrationStatus();
             $this->migrationStatusRepository->remove($migrationStatus);
-            $this->persistenceManager->whitelistObject($migrationStatus);
+
+            // Flow backwards compatibility check
+            if (method_exists($this->persistenceManager, 'allowObject')) {
+                $this->persistenceManager->allowObject($migrationStatus);
+            } else {
+                $this->persistenceManager->whitelistObject($migrationStatus);
+            }
+
             $this->persistenceManager->persistAll(true);
         }
     }
