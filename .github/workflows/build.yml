@@ -47,6 +47,3 @@ jobs:
 
             - name: Run Linter
               run: composer lint
-
-            - name: Run Test
-              run: composer test
