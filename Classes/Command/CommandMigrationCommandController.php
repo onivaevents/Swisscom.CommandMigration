@@ -1,4 +1,5 @@
 <?php
+
 namespace Swisscom\CommandMigration\Command;
 
 use Neos\Flow\Annotations as Flow;
@@ -9,7 +10,6 @@ use Neos\Flow\Cli\CommandController;
  */
 class CommandMigrationCommandController extends CommandController
 {
-
     /**
      * @var \Swisscom\CommandMigration\MigrationService
      * @Flow\Inject
@@ -81,6 +81,6 @@ class CommandMigrationCommandController extends CommandController
             throw new \InvalidArgumentException('You must specify whether you want to --add or --delete the specified version.');
         }
         $this->migrationService->markAsMigrated($version, $add ?: false);
-        $this->outputLine('Migration %s marked as %smigrated', [$version, $add ? '': 'not ']);
+        $this->outputLine('Migration %s marked as %smigrated', [$version, $add ? '' : 'not ']);
     }
 }

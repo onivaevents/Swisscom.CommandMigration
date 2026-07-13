@@ -1,4 +1,5 @@
 <?php
+
 namespace Swisscom\CommandMigration\Domain\Repository;
 
 use Neos\Flow\Annotations as Flow;

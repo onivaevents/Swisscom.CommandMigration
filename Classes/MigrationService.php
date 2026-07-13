@@ -1,4 +1,5 @@
 <?php
+
 namespace Swisscom\CommandMigration;
 
 use Neos\Flow\Annotations as Flow;
@@ -17,7 +18,6 @@ use Swisscom\CommandMigration\Domain\Model\MigrationStatus;
  */
 class MigrationService
 {
-
     /**
      * @var array
      */
@@ -60,7 +60,7 @@ class MigrationService
      * @param bool $quiet
      * @param \Closure $outputCallback
      */
-    public function executeMigrations(string $versionNumber = null, bool $dryRun = false, bool $quiet = false, \Closure $outputCallback): void
+    public function executeMigrations(string $versionNumber, bool $dryRun, bool $quiet, \Closure $outputCallback): void
     {
         $targetMigrationDto = is_string($versionNumber) ? $this->getMigrations($versionNumber)[$versionNumber] : null;
 
@@ -92,7 +92,7 @@ class MigrationService
      * @param bool $quiet
      * @param \Closure $outputCallback
      */
-    public function executeMigration(string $versionNumber, bool $dryRun = false, bool $quiet = false, \Closure $outputCallback): void
+    public function executeMigration(string $versionNumber, bool $dryRun, bool $quiet, \Closure $outputCallback): void
     {
         $dto = $this->getMigrations($versionNumber)[$versionNumber];
         $this->migrate($dto, $dryRun, $quiet, $outputCallback);
@@ -127,7 +127,6 @@ class MigrationService
                 $output .= PHP_EOL . ' <info>==</info> Available Migration Versions' . PHP_EOL;
 
                 foreach ($migrations as $versionNumber => $dto) {
-
                     $packageKey = $this->getPackageKeyFromMigrationVersion($dto->getMigration());
                     $croppedPackageKey = strlen($packageKey) < 30 ? $packageKey : substr($packageKey, 0, 29) . '~';
                     $packageKeyColumn = ' ' . str_pad($croppedPackageKey, 30, ' ');
@@ -143,7 +142,7 @@ class MigrationService
                 }
             }
             $migratedVersions = $this->migrationStatusRepository->findAll()->toArray();
-            $executedUnavailableMigrations = array_filter($migratedVersions, function(MigrationStatus $migrationStatus) use ($migrations) {
+            $executedUnavailableMigrations = array_filter($migratedVersions, function (MigrationStatus $migrationStatus) use ($migrations) {
                 return ! in_array($migrationStatus->getVersion(), array_keys($migrations));
             });
             if (count($executedUnavailableMigrations)) {
@@ -377,5 +376,4 @@ class MigrationService
 
         return '';
     }
-
 }

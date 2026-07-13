@@ -1,4 +1,5 @@
 <?php
+
 namespace Swisscom\CommandMigration;
 
 use Neos\Flow\Annotations as Flow;
@@ -8,7 +9,6 @@ use Neos\Flow\Annotations as Flow;
  */
 class MigrationUtility
 {
-
     /**
      * Returns the version of a migration object, e.g. '20120126163610'.
      * This function is copied from \Neos\Flow\Core\Migrations\AbstractMigration
@@ -71,5 +71,4 @@ class MigrationUtility
 
         return '';
     }
-
 }

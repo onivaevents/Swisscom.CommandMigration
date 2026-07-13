@@ -1,4 +1,5 @@
 <?php
+
 namespace Swisscom\CommandMigration\Domain\Dto;
 
 use Swisscom\CommandMigration\AbstractMigration;
@@ -6,7 +7,6 @@ use Swisscom\CommandMigration\Domain\Model\MigrationStatus;
 
 class MigrationDto
 {
-
     /**
      * @var AbstractMigration
      */
@@ -50,5 +50,4 @@ class MigrationDto
     {
         return ($this->migrationStatus instanceof MigrationStatus);
     }
-
 }

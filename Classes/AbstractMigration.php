@@ -1,4 +1,5 @@
 <?php
+
 namespace Swisscom\CommandMigration;
 
 use Neos\Flow\Annotations as Flow;
@@ -9,7 +10,6 @@ use Neos\Flow\Core\Booting\Scripts;
  */
 abstract class AbstractMigration
 {
-
     /**
      * @var array
      */
@@ -73,5 +73,4 @@ abstract class AbstractMigration
             'arguments' => $commandArguments,
         ];
     }
-
 }
