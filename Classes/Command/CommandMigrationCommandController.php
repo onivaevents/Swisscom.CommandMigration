@@ -21,11 +21,11 @@ class CommandMigrationCommandController extends CommandController
      *
      * Run the pending migration commands provided by currently active packages.
      *
-     * @param string $version The version to migrate to
+     * @param string|null $version The version to migrate to
      * @param boolean $dryRun Whether to do a dry run or not
      * @param boolean $quiet if set, only output of failed commands will be echoed
      */
-    public function migrateCommand(?string $version = null, bool $dryRun = false, bool $quiet = false)
+    public function migrateCommand(?string $version = null, bool $dryRun = false, bool $quiet = false): void
     {
         $consoleOutput = $this->output;
         $this->migrationService->executeMigrations($version, $dryRun, $quiet, function ($output) use ($quiet, $consoleOutput) {
@@ -43,7 +43,7 @@ class CommandMigrationCommandController extends CommandController
      * @param string $version The migration to execute
      * @param boolean $dryRun Whether to do a dry run or not
      */
-    public function migrationExecuteCommand(string $version, bool $dryRun = false)
+    public function migrationExecuteCommand(string $version, bool $dryRun = false): void
     {
         $consoleOutput = $this->output;
         $this->migrationService->executeMigration($version, $dryRun, false, function ($output) use ($consoleOutput) {
@@ -59,7 +59,7 @@ class CommandMigrationCommandController extends CommandController
      * @param boolean $showMigrations Output a list of all migrations and their status
      * @param boolean $showDescriptions Show descriptions for the migrations (enables versions display)
      */
-    public function migrationStatusCommand(bool $showMigrations = false, bool $showDescriptions = false)
+    public function migrationStatusCommand(bool $showMigrations = false, bool $showDescriptions = false): void
     {
         if ($showDescriptions) {
             $showMigrations = true;
@@ -74,7 +74,7 @@ class CommandMigrationCommandController extends CommandController
      * @param boolean $add The migration to mark as migrated
      * @param boolean $delete The migration to mark as not migrated
      */
-    public function migrationVersionCommand(string $version, bool $add = false, bool $delete = false)
+    public function migrationVersionCommand(string $version, bool $add = false, bool $delete = false): void
     {
 
         if ($add === false && $delete === false) {

@@ -4,6 +4,7 @@ namespace Swisscom\CommandMigration;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Core\Migrations\Tools;
+use Neos\Flow\Package\FlowPackageInterface;
 use Neos\Flow\Package\PackageInterface;
 use Neos\Flow\Package\PackageManager;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
@@ -20,6 +21,7 @@ class MigrationService
 {
     /**
      * @var array
+     * @phpstan-var array<string, array{packageKey:string, category:string, path:string, meta: null|array{description:string, version?:string, title?:string }, composerManifest:mixed[]}>
      */
     protected $packagesData = null;
 
@@ -31,6 +33,7 @@ class MigrationService
     /**
      * @Flow\InjectConfiguration(package="Neos.Flow")
      * @var array
+     * @phpstan-var array<string, mixed>
      */
     protected $flowSettings;
 
@@ -55,12 +58,12 @@ class MigrationService
     /**
      * Execute all new migrations, up to $versionNumber if given.
      *
-     * @param null|string $versionNumber
+     * @param string|null $versionNumber
      * @param bool $dryRun
      * @param bool $quiet
      * @param \Closure $outputCallback
      */
-    public function executeMigrations(string $versionNumber, bool $dryRun, bool $quiet, \Closure $outputCallback): void
+    public function executeMigrations(?string $versionNumber, bool $dryRun, bool $quiet, \Closure $outputCallback): void
     {
         $targetMigrationDto = is_string($versionNumber) ? $this->getMigrations($versionNumber)[$versionNumber] : null;
 
@@ -184,8 +187,14 @@ class MigrationService
         if ($this->packagesData !== null) {
             return;
         }
-        $this->packagesData = Tools::getPackagesData(FLOW_PATH_PACKAGES);
 
+        if (defined('FLOW_PATH_PACKAGES') === false) {
+            $this->migrations = [];
+            $this->packagesData = [];
+            return;
+        }
+
+        $this->packagesData =  Tools::getPackagesData(FLOW_PATH_PACKAGES);
         $this->migrations = [];
         foreach ($this->packagesData as $packageKey => $packageData) {
             $this->registerMigrationFiles(Files::concatenatePaths([FLOW_PATH_PACKAGES, $packageData['category'], $packageKey]));
@@ -216,6 +225,7 @@ class MigrationService
             /** @var AbstractMigration $migration */
             $migration = new $className($this, $packageKey);
             $versionNumber = MigrationUtility::getVersionNumber($migration);
+            /** @phpstan-ignore method.notFound (this is a magic method) */
             $migrationStatus =  $this->migrationStatusRepository->findOneByVersion($versionNumber);
             $dto = new MigrationDto($migration, $migrationStatus);
             $this->migrations[$versionNumber] = $dto;
@@ -267,7 +277,7 @@ class MigrationService
     /**
      * Returns the current migration status as an array.
      *
-     * @return string[]
+     * @return array<string, int|string>
      */
     protected function getMigrationStatus(): array
     {
@@ -294,10 +304,10 @@ class MigrationService
 
         return [
             'Name' => 'Command Migrations',
-            'Previous Version' => MigrationUtility::getFormattedVersion($previous),
-            'Current Version' => MigrationUtility::getFormattedVersion($current),
-            'Next Version' => MigrationUtility::getFormattedVersion($next),
-            'Latest Version' => MigrationUtility::getFormattedVersion($latest),
+            'Previous Version' => MigrationUtility::getFormattedVersion((string)$previous),
+            'Current Version' => MigrationUtility::getFormattedVersion((string)$current),
+            'Next Version' => MigrationUtility::getFormattedVersion((string)$next),
+            'Latest Version' => MigrationUtility::getFormattedVersion((string)$latest),
             'Executed Migrations' => $numExecutedMigrations,
             'Executed Unavailable Migrations' => $numExecutedUnavailableMigrations,
             'Available Migrations' => count($migrations),
@@ -314,18 +324,10 @@ class MigrationService
             $versionNumber = MigrationUtility::getVersionNumber($dto->getMigration());
             $migrationStatus = new MigrationStatus($versionNumber);
             $this->migrationStatusRepository->add($migrationStatus);
-
-            // Flow backwards compatibility check
-            if (method_exists($this->persistenceManager, 'allowObject')) {
-                $this->persistenceManager->allowObject($migrationStatus);
-            } else {
-                $this->persistenceManager->whitelistObject($migrationStatus);
-            }
-
+            $this->persistenceManager->allowObject($migrationStatus);
             $this->persistenceManager->persistAll(true);
         }
     }
-
 
     /**
      * @param MigrationDto $dto
@@ -335,14 +337,7 @@ class MigrationService
         if ($dto->isMigrated()) {
             $migrationStatus = $dto->getMigrationStatus();
             $this->migrationStatusRepository->remove($migrationStatus);
-
-            // Flow backwards compatibility check
-            if (method_exists($this->persistenceManager, 'allowObject')) {
-                $this->persistenceManager->allowObject($migrationStatus);
-            } else {
-                $this->persistenceManager->whitelistObject($migrationStatus);
-            }
-
+            $this->persistenceManager->allowObject($migrationStatus);
             $this->persistenceManager->persistAll(true);
         }
     }
@@ -364,12 +359,18 @@ class MigrationService
         });
 
         $reflectedClass = new \ReflectionClass($migration);
-        $classPathAndFilename = Files::getUnixStylePath($reflectedClass->getFileName());
+        $fileName = $reflectedClass->getFileName();
+        if ($fileName === false) {
+            return '';
+        }
+        $classPathAndFilename = Files::getUnixStylePath($fileName);
 
-        /** @var $package PackageInterface */
         foreach ($sortedAvailablePackages as $package) {
+            if (!$package instanceof FlowPackageInterface) {
+                continue;
+            }
             $packagePath = Files::getUnixStylePath($package->getPackagePath());
-            if (strpos($classPathAndFilename, $packagePath) === 0) {
+            if (str_starts_with($classPathAndFilename, $packagePath)) {
                 return $package->getPackageKey();
             }
         }

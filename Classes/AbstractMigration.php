@@ -11,7 +11,7 @@ use Neos\Flow\Core\Booting\Scripts;
 abstract class AbstractMigration
 {
     /**
-     * @var array
+     * @var array<int, array{identifier: string, arguments: array<string, mixed>}>
      */
     protected $commands = [];
 
@@ -26,7 +26,7 @@ abstract class AbstractMigration
     /**
      * Execute the commands for this migration
      *
-     * @param array $settings The Neos.Flow settings
+     * @param array<string, mixed> $settings The Neos.Flow settings
      * @param bool $outputResults If false the output of this command is only echoed if the execution was not successful
      */
     public function execute($settings, bool $outputResults = true): void
@@ -64,7 +64,7 @@ abstract class AbstractMigration
      * Add a command to be executed during the migration
      *
      * @param string $commandIdentifier Command identifier, i.e. neos.flow:cache:flush
-     * @param array $commandArguments The arguments for the given command
+     * @param array<string, mixed> $commandArguments The arguments for the given command
      */
     protected function addCommand(string $commandIdentifier, array $commandArguments = []): void
     {
