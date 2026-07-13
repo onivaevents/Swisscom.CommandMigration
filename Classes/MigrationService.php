@@ -240,7 +240,7 @@ class MigrationService
      * @return MigrationDto[]
      * @throws \InvalidArgumentException
      */
-    protected function getMigrations(string $versionNumber = null): array
+    protected function getMigrations(?string $versionNumber = null): array
     {
         $this->initialize();
 
