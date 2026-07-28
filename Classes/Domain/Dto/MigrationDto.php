@@ -1,4 +1,5 @@
 <?php
+
 namespace Swisscom\CommandMigration\Domain\Dto;
 
 use Swisscom\CommandMigration\AbstractMigration;
@@ -6,20 +7,19 @@ use Swisscom\CommandMigration\Domain\Model\MigrationStatus;
 
 class MigrationDto
 {
-
     /**
      * @var AbstractMigration
      */
     protected $migration;
 
     /**
-     * @var MigrationStatus
+     * @var MigrationStatus|null
      */
     protected $migrationStatus;
 
     /**
      * @param AbstractMigration $migration
-     * @param null|MigrationStatus $migrationStatus
+     * @param MigrationStatus|null $migrationStatus
      */
     public function __construct(AbstractMigration $migration, ?MigrationStatus $migrationStatus)
     {
@@ -40,6 +40,9 @@ class MigrationDto
      */
     public function getMigrationStatus(): MigrationStatus
     {
+        if ($this->migrationStatus === null) {
+            throw new \Exception('No status before migrating');
+        }
         return $this->migrationStatus;
     }
 
@@ -50,5 +53,4 @@ class MigrationDto
     {
         return ($this->migrationStatus instanceof MigrationStatus);
     }
-
 }

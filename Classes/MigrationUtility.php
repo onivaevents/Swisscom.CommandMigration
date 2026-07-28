@@ -1,4 +1,5 @@
 <?php
+
 namespace Swisscom\CommandMigration;
 
 use Neos\Flow\Annotations as Flow;
@@ -8,7 +9,6 @@ use Neos\Flow\Annotations as Flow;
  */
 class MigrationUtility
 {
-
     /**
      * Returns the version of a migration object, e.g. '20120126163610'.
      * This function is copied from \Neos\Flow\Core\Migrations\AbstractMigration
@@ -16,9 +16,14 @@ class MigrationUtility
      * @param object $object The migration class object
      * @return string
      */
-    public static function getVersionNumber($object): string
+    public static function getVersionNumber(object $object): string
     {
-        return substr(strrchr(get_class($object), 'Version'), 7);
+        $className = get_class($object);
+        $lastStrPos = strrchr($className, 'Version');
+        if ($lastStrPos === false) {
+            throw new \Exception(sprintf('Migration classname %s did not match pattern "Version[__Timestamp__]"', $className));
+        }
+        return substr($lastStrPos, 7);
     }
 
     /**
@@ -28,16 +33,16 @@ class MigrationUtility
      * @param object $object The migration class object
      * @return string
      */
-    public static function getDescription($object): string
+    public static function getDescription(object $object): string
     {
         $reflectionClass = new \ReflectionClass($object);
-        $lines = explode(chr(10), $reflectionClass->getDocComment());
+        $lines = explode(chr(10), $reflectionClass->getDocComment() ?: '');
         foreach ($lines as $line) {
             $line = trim($line);
             if ($line === '' || $line === '/**' || $line === '*' || $line === '*/' || strpos($line, '* @') !== false) {
                 continue;
             }
-            return preg_replace('/\s*\\/?[\\\\*]*\s?(.*)$/', '$1', $line);
+            return preg_replace('/\s*\\/?[\\\\*]*\s?(.*)$/', '$1', $line) ?? '';
         }
         return '';
     }
@@ -48,7 +53,7 @@ class MigrationUtility
      * @param string $version
      * @return string
      */
-    public static function getFormattedVersion($version)
+    public static function getFormattedVersion(string $version): string
     {
         if ($version === '') {
             return '<comment>0</comment>';
@@ -63,7 +68,7 @@ class MigrationUtility
      * @param string $version
      * @return string
      */
-    public static function getDateTime($version)
+    public static function getDateTime(string $version): string
     {
         if ($datetime = \DateTime::createFromFormat('YmdHis', $version)) {
             return $datetime->format('Y-m-d H:i:s');
@@ -71,5 +76,4 @@ class MigrationUtility
 
         return '';
     }
-
 }

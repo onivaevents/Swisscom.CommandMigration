@@ -1,4 +1,5 @@
 <?php
+
 namespace Swisscom\CommandMigration\Domain\Model;
 
 use Neos\Flow\Annotations as Flow;
@@ -28,5 +29,4 @@ class MigrationStatus
     {
         return $this->version;
     }
-
 }

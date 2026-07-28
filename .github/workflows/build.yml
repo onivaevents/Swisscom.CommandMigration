@@ -1,0 +1,49 @@
+name: build
+
+on:
+  push:
+      branches:
+        - 'main'
+  pull_request:
+      branches:
+        - 'main'
+
+jobs:
+    test:
+        name: "Test (PHP ${{ matrix.php-versions }}, Flow ${{ matrix.flow-versions }})"
+
+        strategy:
+            fail-fast: false
+            matrix:
+                php-versions: ["8.2"]
+                flow-versions: ["8.3"]
+                include:
+                  - php-versions: '8.3'
+                    flow-versions: '8.3'
+                  - php-versions: '8.4'
+                    flow-versions: '8.4'
+                  - php-versions: '8.4'
+                    flow-versions: '9.0'
+                  - php-versions: '8.5'
+                    flow-versions: '9.1'
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  path: ${{ env.FLOW_FOLDER }}
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-versions }}
+                  extensions: mbstring, xml, json, zlib, iconv, intl, pdo_sqlite
+                  ini-values: date.timezone="Africa/Tunis", opcache.fast_shutdown=0, apc.enable_cli=on
+
+            - name: Set Neos Version
+              run: composer require neos/flow ^${{ matrix.flow-versions }} --no-progress --no-interaction
+
+            - name: Run Linter
+              run: composer lint
